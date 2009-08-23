@@ -1,0 +1,24 @@
+* [2009-08-23 Sun] 
+  :CLOCK:
+  CLOCK: [2009-08-23 Sun 22:00]--[2009-08-23 Sun 22:36] =>  0:30
+  :END:
+  - Analysed 24Hour dumps and daily dumps. 
+  - The daily dumps are just single zipped XML files. Multiple entries
+    (primary key appears to serial_number). Each zipfile decompresses
+    into a single XML file
+  - The 24 hour dumps are more complicated and contain images as well
+    as metadata as an XML document in directories named after the
+    serial numbers. 
+  - *The numbers are mutually exclusive.* What is there in the daily
+    dumps is not there in 24 hour dumps. I think one of them is an
+    application in pending (probably the 24 hour dump since it says
+    'application-form' and what not) and the other is a granted
+    application (although it seems to contain an event log where other
+    things are said).
+     - A few queries on the web using these numbers should sort out this
+       confusion.
+  - If so, I think the right way to go is to parse and upload the
+    granted applications (ie. daily dump) rather than the 24 hour
+    ones.
+    
+    
