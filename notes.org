@@ -1,5 +1,6 @@
 * [2009-08-23 Sun] 
   :CLOCK:
+  CLOCK: [2009-08-24 Mon 23:37]--[2009-08-25 Tue 00:13] =>  0:36
   CLOCK: [2009-08-23 Sun 22:00]--[2009-08-23 Sun 22:36] =>  0:30
   :END:
   - Analysed 24Hour dumps and daily dumps. 
