@@ -12,7 +12,7 @@
     serial numbers. 
   - *The numbers are mutually exclusive.* What is there in the daily
     dumps is not there in 24 hour dumps. I think one of them is an
-    application in pending (probably the 24 hour dump since it says
+    application in pending (probably the 24 hour dump since it saysp
     'application-form' and what not) and the other is a granted
     application (although it seems to contain an event log where other
     things are said).
@@ -21,5 +21,13 @@
   - If so, I think the right way to go is to parse and upload the
     granted applications (ie. daily dump) rather than the 24 hour
     ones.
-    
-    
+* [2009-08-25 Tue]
+  CLOCK: [2009-08-25 Tue 22:47]--[2009-08-25 Tue 23:44] =>  0:57
+  - We will first parse the =daily= directories and worry about the
+    rest later.
+
+Word Mark          : case-file-header/mark-identification  
+Goods and Services : 
+
+
+
