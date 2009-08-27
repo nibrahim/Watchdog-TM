@@ -26,7 +26,7 @@
   - We will first parse the =daily= directories and worry about the
     rest later.
 
-Word Mark          : case-file-header/mark-identification  
+Word Mark          : Combination of 
 Goods and Services : 
 
 
