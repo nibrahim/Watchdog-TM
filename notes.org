@@ -55,9 +55,10 @@
 	- =ammend-to-register-date= is the date on which the TM was
           entered as an ammendment to a register.
 	- =abandonment-date= is the date on which the TM will be abandoned.
-	- =cacellation-code= A one character code indicating that the
+	- =cancellation-code= A one character code indicating that the
           reg is being cancelled or that it parts be cancelled. 
-	- 
+	- =cancellation-date= The date on which the TM is being
+          cancelled. 
 
 
 
