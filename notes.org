@@ -27,7 +27,7 @@
     rest later.
 
 * [2009-09-07 Mon]
-  CLOCK: [2009-09-07 Mon 01:02]
+  CLOCK: [2009-09-07 Mon 01:02]--[2009-09-07 Mon 01:33] =>  0:31
   Using file:///home/noufal/projects/python/watchdog/2/docs/Trademark-Applications-Documentation-v2.0-07152005.pdf
   - Inside =application-information=
   - Check if =data-available-code=. If it's there, there is no data
