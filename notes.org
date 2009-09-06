@@ -26,8 +26,40 @@
   - We will first parse the =daily= directories and worry about the
     rest later.
 
-Word Mark          : Combination of 
-Goods and Services : 
+* [2009-09-07 Mon]
+  CLOCK: [2009-09-07 Mon 01:02]
+  Using file:///home/noufal/projects/python/watchdog/2/docs/Trademark-Applications-Documentation-v2.0-07152005.pdf
+  - Inside =application-information=
+  - Check if =data-available-code=. If it's there, there is no data
+    and we don't need to parse this file.
+  - Inside =file-segments=, we will have multiple =file-segment= and
+    =action-keys=.
+  - =file-segment= will always contain TMRK
+  - =action-keys= will contain the event that this is coming here for
+    and will bunch a group of cases together.
+  - This will be followed by multiple =case-file= s. For each one, 
+      * =serial-number= is an 8 digit code *M*
+      * =registration-number= 7 digit number *O*
+      * =Transaction-date= Date of the processing (might be useful to check later).
+      * The =case-file-header= which will contain
+	- =filing-date= Containing the date of filing at the USPTO
+	- =registration-date= Containing the date on which the TM was registered
+	- =status-code= 3 position code containing status of the TM.
+	- =status-date= Date on which status was changed to the current one.
+	- =mark-identification= Variable length field containing the
+          acual TM characters.
+	- =mark-drawing-code= Contains a 4 position code mentioning
+          the physical characteristics of the mark.
+	- =published-for-opposition= The date on which the TM was
+          published for opposition in the official gazette.
+	- =ammend-to-register-date= is the date on which the TM was
+          entered as an ammendment to a register.
+	- =abandonment-date= is the date on which the TM will be abandoned.
+	- =cacellation-code= A one character code indicating that the
+          reg is being cancelled or that it parts be cancelled. 
+	- 
+
+
 
 
 
