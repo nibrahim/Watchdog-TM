@@ -60,6 +60,27 @@
 	- =cancellation-date= The date on which the TM is being
           cancelled. 
 
+* [2009-10-05 Mon]
+  :CLOCK:
+  CLOCK: [2009-10-05 Mon 22:36]
+  CLOCK: [2009-10-05 Mon 22:31]--[2009-10-05 Mon 22:33] =>  0:02
+  :END:
+        - =republished-12-c-date= Optional node indicating
+          republishing date under section 12c.
+        - =domestic-representative-name= contains the "Domestic
+          representative" for the TM.
+        - =attorney-docket-number= 12 character wide field to identify
+          attorney/case.
+        - =attorney-name= Name of the attorney.
+        - =principal-register-amended-in= Optional 1 character field
+          indicating (T/F) whether register is ammended for
+          application on principal registrar.
+        - =trademark-in= One character field with 'T' indicating that
+          the mark is used as a TradeMark.
+        - =collective-trademark-in= Same as above with 'T' indicating
+          that it's used as a collective trademark.
+        - This enumeration is a fool's errand. BEtter make the sql
+          file directly.
 
 
 
