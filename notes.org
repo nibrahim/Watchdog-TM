@@ -62,7 +62,7 @@
 
 * [2009-10-05 Mon]
   :CLOCK:
-  CLOCK: [2009-10-05 Mon 22:36]
+  CLOCK: [2009-10-05 Mon 22:36]--[2009-10-05 Mon 23:14] =>  0:38
   CLOCK: [2009-10-05 Mon 22:31]--[2009-10-05 Mon 22:33] =>  0:02
   :END:
         - =republished-12-c-date= Optional node indicating
@@ -79,7 +79,7 @@
           the mark is used as a TradeMark.
         - =collective-trademark-in= Same as above with 'T' indicating
           that it's used as a collective trademark.
-        - This enumeration is a fool's errand. BEtter make the sql
+        - This enumeration is a fool's errand. Better make the sql
           file directly.
 
 
