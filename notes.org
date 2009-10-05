@@ -63,7 +63,7 @@
 * [2009-10-05 Mon]
   :CLOCK:
   CLOCK: [2009-10-05 Mon 22:36]--[2009-10-05 Mon 23:14] =>  0:38
-  CLOCK: [2009-10-05 Mon 22:31]--[2009-10-05 Mon 22:33] =>  0:02
+  CLOCK: [2009-10-05 Mon 22:31]--[2009-10-05 Mon 23:30] =>  0:59
   :END:
         - =republished-12-c-date= Optional node indicating
           republishing date under section 12c.
