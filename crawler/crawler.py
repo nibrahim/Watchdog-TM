@@ -1,4 +1,4 @@
-#!/usr/bin/python2.6
+#!/usr/bin/env python
 
 from xml.etree.cElementTree import ElementTree
 
@@ -20,24 +20,3 @@ def parse(f):
 if __name__ == "__main__":
     parse("sample_data/daily/sample.xml")
     # parse("sample_data/daily/apc090101.xml")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
