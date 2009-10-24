@@ -2,13 +2,31 @@
 
 from xml.etree.cElementTree import ElementTree
 
+def extract_header_information(node):
+    info = {}
+    for i in ["serial-number",
+              "registration-number",
+              "transaction-date"]:
+        print " Node being checked is ",node
+        print " Looking for ",i
+        n = node.find(i)
+        print " Found ",n," Asserting"
+        assert n
+        val = n.text.strip()
+        info[i] = val
+    return info
+    
+
 def parse(f):
     tree = ElementTree()
     tree.parse(f)
+    count = 0
     for node in tree.findall("application-information/file-segments/action-keys/case-file"):
-        print "-------------------", node,
-        for element in node.getchildren():
-            print element.tag.strip()
+        print "Node outside ", node
+        serial_number = node.find("serial-number").text.strip()
+        print serial_number
+        header = extract_header_information(node)
+        
             # if element.getchildren():
             #     for i in element.getchildren():
             #         print "" 
