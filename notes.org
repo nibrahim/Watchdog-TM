@@ -83,7 +83,7 @@
           file directly.
     - Continue from case file event statements section (Page 21).
 * [2009-10-25 Sun]
-  CLOCK: [2009-10-25 Sun 00:34]
+  CLOCK: [2009-10-25 Sun 00:34]--[2009-10-25 Sun 01:04] =>  0:30
   - Our analysis was wrong. Need to revisit tables. 
   - Went through the DTD upto page 22. Trying to implement a crude
     parser. 
