@@ -88,3 +88,12 @@
   - Went through the DTD upto page 22. Trying to implement a crude
     parser. 
   
+* [2009-10-25 Sun]
+  :CLOCK:
+  CLOCK: [2009-10-26 Mon 00:55]--[2009-10-26 Mon 01:26] =>  0:31
+  CLOCK: [2009-10-25 Sun 22:31]--[2009-10-25 Sun 23:00] =>  0:29
+  :END:
+  - Might need to refactor after figuring out elementree properly. 
+  - Start parsing the rest of the body of the element and print it
+    out.
+

@@ -1,19 +1,43 @@
 #!/usr/bin/env python
+import code
 
-from xml.etree.cElementTree import ElementTree
 
-def extract_header_information(node):
+from xml.etree.ElementTree import ElementTree
+
+# This is a list of the mandatory fields outside the 
+# "case-file-header" node.
+_case_file_identification_fields = ["serial-number",       
+                                    "registration-number",
+                                    "transaction-date",
+                                    ]
+
+# This is the list of the fields inside the "case-file-header"
+# section.
+_case_file_header_fields = ["filing-date",
+                            "registration-date",
+                            "status-code",
+                            "status-date",
+                            "mark-id",
+                            "mark-drawing-code",
+                            "published-for-opposition-date",
+                            "amend-to-register-date",
+                            "abandonment-date",
+                            "cancellation-date",
+                            "republished-12c-date"
+                            "domestic-rep-name",
+                            # Add rest of fields here: TBD
+                            "employee-name",
+                            ]
+
+def extract_fields(node,fields):
+    """Extracts the information from the nodes in 'fields' from the
+    'node' and returns them in a hash"""
     info = {}
-    for i in ["serial-number",
-              "registration-number",
-              "transaction-date"]:
-        print " Node being checked is ",node
-        print " Looking for ",i
+    for i in fields:
         n = node.find(i)
-        print " Found ",n," Asserting"
-        assert n
-        val = n.text.strip()
-        info[i] = val
+        if n is not None:
+            val = n.text.strip()
+            info[i] = val
     return info
     
 
@@ -22,11 +46,11 @@ def parse(f):
     tree.parse(f)
     count = 0
     for node in tree.findall("application-information/file-segments/action-keys/case-file"):
-        print "Node outside ", node
-        serial_number = node.find("serial-number").text.strip()
-        print serial_number
-        header = extract_header_information(node)
-        
+        ident = extract_fields(node,_case_file_identification_fields)
+        print ident
+        header = extract_fields(node.find("case-file-header"),_case_file_header_fields)
+        for i,j in header.iteritems():
+            print "  %-40s  %s"%(i,j)
             # if element.getchildren():
             #     for i in element.getchildren():
             #         print "" 
