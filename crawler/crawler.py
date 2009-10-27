@@ -112,17 +112,8 @@ def extract_case_file_event_statements(node):
     if not node:
         return ret
     for i in node.findall("case-file-event-statement"):
-        code = i.find("code").text.strip()
-        typ  = i.find("type").text.strip()
-        desc = i.find("description-text").text.strip()
-        date = i.find("date").text.strip()
-        number = i.find("number").text.strip()
-        ret.append({'code'   : code,
-                    'type'   : typ,
-                    'desc'   : desc,
-                    'date'   : date,
-                    'number' : number
-                    })
+        d = extract_fields(i,_case_file_event_statement_fields)
+        ret.append(d)
     return ret
 
 
