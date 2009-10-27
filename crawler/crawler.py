@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import code
-
+import logging
 
 from xml.etree.ElementTree import ElementTree
 
@@ -28,6 +28,7 @@ _case_file_header_fields = ["filing-date",
                             # Add rest of fields here: TBD
                             "employee-name",
                             ]
+
 
 def extract_fields(node,fields):
     """Extracts the information from the nodes in 'fields' from the
@@ -60,5 +61,6 @@ def parse(f):
 
         
 if __name__ == "__main__":
+    logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
     parse("sample_data/daily/sample.xml")
     # parse("sample_data/daily/apc090101.xml")
