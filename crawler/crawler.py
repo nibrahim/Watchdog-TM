@@ -88,7 +88,6 @@ _correspondent_fields = ["address-1",
                          "address-5"]
 
                          
-                         
 def extract_fields(node,fields):
     """Extracts the information from the nodes in 'fields' from the
     'node' and returns them in a hash"""
@@ -189,7 +188,51 @@ def extract_classifications(node):
         ret.append(d)
     return ret
 
+def extract_case_file_owners(node):
+    """Extracts all <case-file-owner> nodes from the given 'node' and
+    returns them in a list of dictionaries"""
+    ret = []
+    if not node:
+        return ret
+    _case_file_owner_fields = ["entry-number",
+                               "party-type",
+                               # "nationality" # Extracted manually since it's composite
+                               "legal-entity-type-code",
+                               "entity-statement",
+                               "party-name",
+                               "address-1",
+                               "address-2",
+                               "city",
+                               "state",
+                               "country",
+                               "other",
+                               "postcode",
+                               "dba-aka-text",
+                               "composed-of-statement",
+                               "name-change-explanation",
+                               ]
+    for i in node.findall("case-file-owner"):
+        d0 = extract_fields(i,_case_file_owner_fields)
+        d1 = extract_fields(i.find("nationality"),["state","country","other"])
+        for key,val in d1.iteritems(): # Flattening out the nationality node into the top level one
+            d0["nationality_%s"%key] = val
+        ret.append(d0)
+    return ret
 
+
+def extract_design_searches(node):
+    """Extracts all <design-search> nodes from the given 'node' and
+    returns them in a list of dictionaries"""
+    ret = []
+    if not node:
+        return ret
+    _design_search_fields = ["code"]
+    for i in node.findall("design-search"):
+        d = extract_fields(i,_design_search_fields)
+        ret.append(d)
+    return ret
+
+    
 
 def parse(f):
     tree = ElementTree()
@@ -246,6 +289,23 @@ def parse(f):
         print " Correspondent:"
         for i,j in correspondent.iteritems():
             print "   %-40s  %s"%(i,j)
+
+        # Case file owners
+        case_file_owners = extract_case_file_owners(node.find("case-file-owners"))
+        print " Case file owners:"
+        for k in case_file_owners:
+            print "   |"
+            for i,j in k.iteritems():
+                print "    - %-40s  %s"%(i,j)
+
+        # Design searches
+        design_searches = extract_design_searches(node.find("design-searches"))
+        print " Design searches:"
+        for k in design_searches:
+            print "   |"
+            for i,j in k.iteritems():
+                print "    - %-40s  %s"%(i,j)
+                                                  
 
         print 80*"="
 
