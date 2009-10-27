@@ -81,7 +81,14 @@ _case_file_header_fields = ["filing-date",
                             "employee-name",
                             ]
 
+_correspondent_fields = ["address-1",
+                         "address-2",
+                         "address-3",
+                         "address-4",
+                         "address-5"]
 
+                         
+                         
 def extract_fields(node,fields):
     """Extracts the information from the nodes in 'fields' from the
     'node' and returns them in a hash"""
@@ -111,10 +118,77 @@ def extract_case_file_event_statements(node):
     ret = []
     if not node:
         return ret
+    _case_file_event_statement_fields = ["code","type","description-text","date","number"]
     for i in node.findall("case-file-event-statement"):
         d = extract_fields(i,_case_file_event_statement_fields)
         ret.append(d)
     return ret
+
+def extract_prior_registration_applications(node):
+    """Extracts all <prior-registration-application> nodes from the
+    given 'node' and returns them in a list of dictionaries. Also gets
+    nodes outside these."""
+    ret = {}
+    if not node:
+        return ret
+    other_indicator = node.find("other-related-in")
+    if other_indicator:
+        other_related_in = other_indicator.text.strip()
+        ret['other_related_in'] = other_related_in
+    prior_reg_applications = []
+    _prior_registration_application_fields = ["relationship-type", "number"]
+    for i in node.findall("prior-registration-application"):
+        prior_reg_applications.append(extract_fields(node.find("prior-registration-application"),
+                                                     _prior_registration_application_fields))
+    ret['prior-registration-applications'] = prior_reg_applications
+    return ret
+
+def extract_foreign_applications(node):
+    """Extracts all <foreign-application> nodes from the given 'node' and
+    returns them in a list of dictionaries"""
+    ret = []
+    if not node:
+        return ret
+    _foreign_application_fields = ["filing-date",
+                                   "registration-date",
+                                   "registration-expiration-date",
+                                   "registration-renewal-date",
+                                   "registration-renewal-expiration-date",
+                                   "entry-number",
+                                   "application-number",
+                                   "country",
+                                   "other",
+                                   "registration-number",
+                                   "renewal-number",
+                                   "foreign-priority-claim-in",
+                                   ]
+    for i in node.findall("foreign-application"):
+        d = extract_fields(i,_foreign_application_fields)
+        ret.append(d)
+    return ret
+
+
+def extract_classifications(node):
+    """Extracts all <classification> nodes from the given 'node' and
+    returns them in a list of dictionaries"""
+    ret = []
+    if not node:
+        return ret
+    _classification_fields = ["international-code-total-no",
+                              "us-code-total-no",
+                              "international-code",
+                              "us-code",
+                              "status-code",
+                              "status-date",
+                              "first-use-anywhere-date",
+                              "first-use-in-commerce-date",
+                              "primary-code",
+                              ]
+    for i in node.findall("classification"):
+        d = extract_fields(i,_classification_fields)
+        ret.append(d)
+    return ret
+
 
 
 def parse(f):
@@ -134,15 +208,47 @@ def parse(f):
         statements = extract_case_file_statements(node.find("case-file-statements"))
         print " Statements:"
         for k in statements:
-            print "   - %-40s  %s"%(k['type-code'],k['text'])
+            print "   - %-40s  %s"%(k['type-code'],k['text'][:20]+"...")
         # Events
         events = extract_case_file_event_statements(node.find("case-file-event-statements"))
         print " Events:"
         for k in events:
-            print "   - %4s %1s %50s %8s %3s"%(k['code'],k['type'],k['desc'],k['date'],k['number'])
-            
+            print "   - %4s %1s %50s %8s %3s"%(k['code'],k['type'],k['description-text'][:45],k['date'],k['number'])
+        # Prior applications
+        prior_apps = extract_prior_registration_applications(node.find("prior-registration-applications"))
+        print " Prior applications:"
+        if 'other_related_in' in prior_apps:
+            print "   Other related indicatior  %s"%prior_apps['other_related_in']
+        if 'prior-registration-applications' in prior_apps:
+            for app in prior_apps['prior-registration-applications']:
+                print "   |"
+                for i,j in app.iteritems():
+                    print "    - %-40s  %s"%(i,j)
+
+        # Foreign applications
+        foreign_applications = extract_foreign_applications(node.find("foreign-applications"))
+        print " Foreign applications:"
+        for k in foreign_applications:
+            print "   |"
+            for i,j in k.iteritems():
+                print "    - %-40s  %s"%(i,j)
+
+        # Classifications
+        classifications = extract_classifications(node.find("classifications"))
+        print " Classifications:"
+        for k in classifications:
+            print "   |"
+            for i,j in k.iteritems():
+                print "    - %-40s  %s"%(i,j)
+
+        #Correspondent
+        correspondent = extract_fields(node.find("correspondent"),_correspondent_fields)
+        print " Correspondent:"
+        for i,j in correspondent.iteritems():
+            print "   %-40s  %s"%(i,j)
 
         print 80*"="
+
         
 if __name__ == "__main__":
     logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
