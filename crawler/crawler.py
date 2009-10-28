@@ -246,6 +246,28 @@ def extract_design_searches(node):
         ret.append(d)
     return ret
 
+
+def extract_madrid_international_filing_record(node):
+    """Extracts all <madrid-international-filing-record> nodes from the given 'node' and
+    returns them in a list of dictionaries"""
+    ret = []
+    if not node:
+        return ret
+    _top_level_madrid_international_filing_record_fields = ["entry-number",
+                                                            "reference-number",
+                                                            "original-filing-date-uspto",
+                                                            "international-registration-number",
+                                                            "international-status-code",
+                                                            "international-status-date"]
+    _madrid_history_events_fields = ["code","date","description-text","entry-number"]
+    for i in node.findall("madrid-international-filing-record"):
+        d = extract_fields(i,_top_level_madrid_international_filing_record_fields)
+        d['madrid-history-events'] = []
+        for j in i.findall("madrid-history-events/madrid-history-event"):
+            d['madrid-history-events'].append(extract_fields(j,_madrid_history_events_fields))
+        ret.append(d)
+    return ret
+                                                            
     
 
 def parse(f):
@@ -325,12 +347,19 @@ def parse(f):
         print " International registration:"
         for i,j in international_registration.iteritems():
             print "   %-40s  %s"%(i,j)
-        
+
+        # Madrid international filing records
+        madrid_international_filing_records = extract_madrid_international_filing_record(node.find("madrid-international-filing-requests"))
+        print " Madrid international filing records:"
+        for k in madrid_international_filing_records:
+            print "   |"
+            for i,j in k.iteritems():
+                print "    - %-40s  %s"%(i,j)
 
         print 80*"="
 
         
 if __name__ == "__main__":
     logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
-    parse("sample_data/daily/sample.xml")
-    # parse("sample_data/daily/apc090101.xml")
+    # parse("sample_data/daily/sample.xml")
+    parse("sample_data/daily/apc090101.xml")
