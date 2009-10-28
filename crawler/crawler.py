@@ -17,18 +17,18 @@ _case_file_header_fields = ["filing-date",
                             "registration-date",
                             "status-code",
                             "status-date",
-                            "mark-id",
+                            "mark-identification",
                             "mark-drawing-code",
                             "published-for-opposition-date",
                             "amend-to-register-date",
                             "abandonment-date",
                             "cancellation-date",
-                            "republished-12c-date"
+                            "republished-12c-date",
                             "domestic-rep-name",
                             "attorney-docket-number",
                             "attorney-name",
-                            "principal-register-ammended-in",
-                            "supplemental-register-ammended-in",
+                            "principal-register-amended-in",
+                            "supplemental-register-amended-in",
                             "trademark-in",
                             "collective-trademark-in",
                             "service-mark-in",
@@ -99,7 +99,7 @@ _international_registration_fields = ["international-registration-number",
                                       "priority-claimed-date",
                                       "first-refusal-in",
                                       ]
-                         
+
 def extract_fields(node,fields):
     """Extracts the information from the nodes in 'fields' from the
     'node' and returns them in a hash"""
