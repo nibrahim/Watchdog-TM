@@ -1,12 +1,13 @@
 -- Based on Trademark-Applications-Documentation-v2.0-07152005.pdf
-drop table trademarks;
+drop table case_file_statements;
+drop table trademarks CASCADE;
 
 CREATE TABLE trademarks (
-       -- file_segment                   varchar(4),     -- Will always contain 'TMRK'
-       action_key                        varchar(2),	 -- Action key for type of event
+       -- file_segment                   varchar(4),                 -- Will always contain 'TMRK'
+       action_key                        varchar(2),	             -- Action key for type of event
        -- Case file starts here
-       serial_number                     varchar(8),     -- Case serial number
-       registration_number               varchar(7),     -- Registration no.
+       serial_number                     varchar(8) PRIMARY KEY,     -- Case serial number (unique)
+       registration_number               varchar(7),                 -- Registration no.
        transaction_date                  date,
        -- Case file header starts here
        filing_date                       date,
@@ -38,20 +39,20 @@ CREATE TABLE trademarks (
        published_concurrent_in           varchar(1),
        concurrent_use_in                 varchar(1),
        concurrent_use_proceeding_in      varchar(1),
-       interface_pending_in              varchar(1),
+       interference_pending_in           varchar(1),
        opposition_pending_in             varchar(1),
        section_12c_in                    varchar(1),
        section_2f_in                     varchar(1),
        section_2f_in_part_in             varchar(1),
        renewal_filed_in                  varchar(1),
-       section8_field_in                 varchar(1),
-       section8_partial_accept_in        varchar(1),
-       section8_accepted_in              varchar(1),
-       section15_acknowledged_in         varchar(1),
-       section15_filed_in                varchar(1),
+       section_8_filed_in                 varchar(1),
+       section_8_partial_accept_in        varchar(1),
+       section_8_accepted_in              varchar(1),
+       section_15_acknowledged_in         varchar(1),
+       section_15_filed_in                varchar(1),
        supplemental_register_in          varchar(1),
        foreign_priority_in               varchar(1),
-       change_registation_in             varchar(1),
+       change_registration_in             varchar(1),
        intent_to_use_in                  varchar(1),
        intent_to_use_current_in          varchar(1),
        filed_as_use_application_in       varchar(1),
@@ -78,15 +79,14 @@ CREATE TABLE trademarks (
        law_office_assigned_location_code varchar(3),
        current_location                  text,
        location_date                     date,
-       employee_name                     text,
+       employee_name                     text
        -- Case file header ends here
-       -- Case file statements fields start here. Will contain multiple case file statement nodes
-       type_code                         varchar(6),  -- Type of case file statementb
-       cfs_text                          varchar(40),
-       -- Case file statements ends here
-       
-       
 );
         
-
+        
+CREATE TABLE case_file_statements (
+       tm                                varchar(8) REFERENCES trademarks,
+       type_code                         varchar(6),
+       text                              varchar(40)
+);
 
