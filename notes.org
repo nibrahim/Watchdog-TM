@@ -93,7 +93,18 @@
   CLOCK: [2009-10-26 Mon 00:55]--[2009-10-26 Mon 01:26] =>  0:31
   CLOCK: [2009-10-25 Sun 22:31]--[2009-10-25 Sun 23:00] =>  0:29
   :END:
-  - Might need to refactor after figuring out elementree properly. 
+  - Might need to refactor after figuring out elementree properly.
   - Start parsing the rest of the body of the element and print it
     out.
 
+* [2009-10-27 Tue]
+  :CLOCK:
+  CLOCK: [2009-10-28 Wed 01:10]--[2009-10-28 Wed 01:49] =>  0:39
+  CLOCK: [2009-10-27 Tue 23:13]--[2009-10-27 Tue 23:45] =>  0:32
+  CLOCK: [2009-10-27 Tue 21:52]--[2009-10-27 Tue 22:29] =>  0:37
+  :END:
+  
+* [2009-10-28 Wed]
+  CLOCK: [2009-10-28 Wed 12:59]--[2009-10-28 Wed 13:37] =>  0:38
+  
+  
