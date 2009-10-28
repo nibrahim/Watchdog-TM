@@ -274,92 +274,95 @@ def parse(f):
     tree = ElementTree()
     tree.parse(f)
     count = 0
-    for node in tree.findall("application-information/file-segments/action-keys/case-file"):
-        # Basic unique identification information
-        ident = extract_fields(node,_case_file_identification_fields)
-        print ident
-        # Header information
-        header = extract_fields(node.find("case-file-header"),_case_file_header_fields)
-        print " Headers:"
-        for i,j in header.iteritems():
-            print "   %-40s  %s"%(i,j)
-        # Statements
-        statements = extract_case_file_statements(node.find("case-file-statements"))
-        print " Statements:"
-        for k in statements:
-            print "   - %-40s  %s"%(k['type-code'],k['text'][:20]+"...")
-        # Events
-        events = extract_case_file_event_statements(node.find("case-file-event-statements"))
-        print " Events:"
-        for k in events:
-            print "   - %4s %1s %50s %8s %3s"%(k['code'],k['type'],k['description-text'][:45],k['date'],k['number'])
-        # Prior applications
-        prior_apps = extract_prior_registration_applications(node.find("prior-registration-applications"))
-        print " Prior applications:"
-        if 'other_related_in' in prior_apps:
-            print "   Other related indicatior  %s"%prior_apps['other_related_in']
-        if 'prior-registration-applications' in prior_apps:
-            for app in prior_apps['prior-registration-applications']:
+    for action_key_node in tree.findall("application-information/file-segments/action-keys"):
+        action_key = action_key_node.find("action-key").text.strip()
+        print "Action key is %s"%action_key
+        for node in action_key_node.findall("case-file"):
+            # Basic unique identification information
+            ident = extract_fields(node,_case_file_identification_fields)
+            print ident
+            # Header information
+            header = extract_fields(node.find("case-file-header"),_case_file_header_fields)
+            print " Headers:"
+            for i,j in header.iteritems():
+                print "   %-40s  %s"%(i,j)
+            # Statements
+            statements = extract_case_file_statements(node.find("case-file-statements"))
+            print " Statements:"
+            for k in statements:
+                print "   - %-40s  %s"%(k['type-code'],k['text'][:20]+"...")
+            # Events
+            events = extract_case_file_event_statements(node.find("case-file-event-statements"))
+            print " Events:"
+            for k in events:
+                print "   - %4s %1s %50s %8s %3s"%(k['code'],k['type'],k['description-text'][:45],k['date'],k['number'])
+            # Prior applications
+            prior_apps = extract_prior_registration_applications(node.find("prior-registration-applications"))
+            print " Prior applications:"
+            if 'other_related_in' in prior_apps:
+                print "   Other related indicatior  %s"%prior_apps['other_related_in']
+            if 'prior-registration-applications' in prior_apps:
+                for app in prior_apps['prior-registration-applications']:
+                    print "   |"
+                    for i,j in app.iteritems():
+                        print "    - %-40s  %s"%(i,j)
+
+            # Foreign applications
+            foreign_applications = extract_foreign_applications(node.find("foreign-applications"))
+            print " Foreign applications:"
+            for k in foreign_applications:
                 print "   |"
-                for i,j in app.iteritems():
+                for i,j in k.iteritems():
                     print "    - %-40s  %s"%(i,j)
 
-        # Foreign applications
-        foreign_applications = extract_foreign_applications(node.find("foreign-applications"))
-        print " Foreign applications:"
-        for k in foreign_applications:
-            print "   |"
-            for i,j in k.iteritems():
-                print "    - %-40s  %s"%(i,j)
+            # Classifications
+            classifications = extract_classifications(node.find("classifications"))
+            print " Classifications:"
+            for k in classifications:
+                print "   |"
+                for i,j in k.iteritems():
+                    print "    - %-40s  %s"%(i,j)
 
-        # Classifications
-        classifications = extract_classifications(node.find("classifications"))
-        print " Classifications:"
-        for k in classifications:
-            print "   |"
-            for i,j in k.iteritems():
-                print "    - %-40s  %s"%(i,j)
+            #Correspondent
+            correspondent = extract_fields(node.find("correspondent"),_correspondent_fields)
+            print " Correspondent:"
+            for i,j in correspondent.iteritems():
+                print "   %-40s  %s"%(i,j)
 
-        #Correspondent
-        correspondent = extract_fields(node.find("correspondent"),_correspondent_fields)
-        print " Correspondent:"
-        for i,j in correspondent.iteritems():
-            print "   %-40s  %s"%(i,j)
+            # Case file owners
+            case_file_owners = extract_case_file_owners(node.find("case-file-owners"))
+            print " Case file owners:"
+            for k in case_file_owners:
+                print "   |"
+                for i,j in k.iteritems():
+                    print "    - %-40s  %s"%(i,j)
 
-        # Case file owners
-        case_file_owners = extract_case_file_owners(node.find("case-file-owners"))
-        print " Case file owners:"
-        for k in case_file_owners:
-            print "   |"
-            for i,j in k.iteritems():
-                print "    - %-40s  %s"%(i,j)
+            # Design searches
+            design_searches = extract_design_searches(node.find("design-searches"))
+            print " Design searches:"
+            for k in design_searches:
+                print "   |"
+                for i,j in k.iteritems():
+                    print "    - %-40s  %s"%(i,j)
 
-        # Design searches
-        design_searches = extract_design_searches(node.find("design-searches"))
-        print " Design searches:"
-        for k in design_searches:
-            print "   |"
-            for i,j in k.iteritems():
-                print "    - %-40s  %s"%(i,j)
+            # International registration
+            international_registration = extract_fields(node.find("international-registration"),_international_registration_fields)
+            print " International registration:"
+            for i,j in international_registration.iteritems():
+                print "   %-40s  %s"%(i,j)
 
-        # International registration
-        international_registration = extract_fields(node.find("international-registration"),_international_registration_fields)
-        print " International registration:"
-        for i,j in international_registration.iteritems():
-            print "   %-40s  %s"%(i,j)
+            # Madrid international filing records
+            madrid_international_filing_records = extract_madrid_international_filing_record(node.find("madrid-international-filing-requests"))
+            print " Madrid international filing records:"
+            for k in madrid_international_filing_records:
+                print "   |"
+                for i,j in k.iteritems():
+                    print "    - %-40s  %s"%(i,j)
 
-        # Madrid international filing records
-        madrid_international_filing_records = extract_madrid_international_filing_record(node.find("madrid-international-filing-requests"))
-        print " Madrid international filing records:"
-        for k in madrid_international_filing_records:
-            print "   |"
-            for i,j in k.iteritems():
-                print "    - %-40s  %s"%(i,j)
-
-        print 80*"="
+            print 80*"="
 
         
 if __name__ == "__main__":
     logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
-    # parse("sample_data/daily/sample.xml")
-    parse("sample_data/daily/apc090101.xml")
+    parse("sample_data/daily/sample.xml")
+    # parse("sample_data/daily/apc090101.xml")
