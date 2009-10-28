@@ -87,11 +87,25 @@ _correspondent_fields = ["address-1",
                          "address-4",
                          "address-5"]
 
+_international_registration_fields = ["international-registration-number",
+                                      "international-registration-date",
+                                      "international-publication-date",
+                                      "international-renewal-date",
+                                      "auto-protection-date",
+                                      "international-death-date",
+                                      "international-status-code",
+                                      "international-status-date",
+                                      "priority-claimed-in",
+                                      "priority-claimed-date",
+                                      "first-refusal-in",
+                                      ]
                          
 def extract_fields(node,fields):
     """Extracts the information from the nodes in 'fields' from the
     'node' and returns them in a hash"""
     info = {}
+    if not node:
+        return info
     for i in fields:
         n = node.find(i)
         if n is not None:
@@ -305,7 +319,13 @@ def parse(f):
             print "   |"
             for i,j in k.iteritems():
                 print "    - %-40s  %s"%(i,j)
-                                                  
+
+        # International registration
+        international_registration = extract_fields(node.find("international-registration"),_international_registration_fields)
+        print " International registration:"
+        for i,j in international_registration.iteritems():
+            print "   %-40s  %s"%(i,j)
+        
 
         print 80*"="
 
