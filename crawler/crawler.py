@@ -102,21 +102,27 @@ _international_registration_fields = ["international-registration-number",
                                       "first-refusal-in",
                                       ]
 
-def extract_fields(node,fields):
+def extract_fields(node, fields, debug = False):
     """Extracts the information from the nodes in 'fields' from the
     'node' and returns them in a hash"""
     info = {}
     if not node:
         return info
     for i in fields:
+        if debug: print i
         n = node.find(i)
-        # Sane values for field value if it's not there in the XML file.
-        if i.endswith("-date"):
-            val = "January 1, 10 BC"
-        else:
-            val = ''
+        val = ''
         if n is not None:
             val = n.text.strip()
+        # Sane values for date field value if it's invalid or
+        # nonexistent in the XML file.
+        if debug:
+            print " val before cleaning is ", val
+        if i.endswith("-date"):
+            if not val or (n.text and n.text.strip() == '0'):
+                val = "January 1, 10 BC"
+        if debug:
+            print " Storing '%s' as '%s'"%(val,i.replace("-","_"))
         info[i.replace("-","_")] = val
     return info
 
@@ -129,7 +135,7 @@ def extract_case_file_statements(node):
     for i in node.findall("case-file-statement"):
         typ  = i.find("type-code").text.strip()
         text = i.find("text").text.strip()
-        ret.append({'type-code': typ, 'text' : text})
+        ret.append({'type_code': typ, 'text' : text})
     return ret
 
 def extract_case_file_event_statements(node):
@@ -287,54 +293,57 @@ def parse_and_insert(f):
         rows = []
         for node in action_key_node.findall("case-file"):
             # Basic unique identification information
-            row = extract_fields(node,_case_file_identification_fields)
-            print row["serial_number"]
+            header = extract_fields(node,_case_file_identification_fields)
+            header['action_key'] = action_key
+            serial_number = header["serial_number"]
+            print "\n ",serial_number,
             # Header information
-            row.update(extract_fields(node.find("case-file-header"),_case_file_header_fields))
-            rows.append(row)
-            # First get the headers to insert properly
-            # # Statements
-            # statements = extract_case_file_statements(node.find("case-file-statements"))
-            # print " Statements:"
-            # for k in statements:
-            #     print "   - %-40s  %s"%(k['type-code'],k['text'][:20]+"...")
-            # # Events
-            # events = extract_case_file_event_statements(node.find("case-file-event-statements"))
-            # print " Events:"
-            # for k in events:
-            #     print "   - %4s %1s %50s %8s %3s"%(k['code'],k['type'],k['description-text'][:45],k['date'],k['number'])
-            # # Prior applications
-            # prior_apps = extract_prior_registration_applications(node.find("prior-registration-applications"))
-            # print " Prior applications:"
-            # if 'other_related_in' in prior_apps:
-            #     print "   Other related indicatior  %s"%prior_apps['other_related_in']
-            # if 'prior-registration-applications' in prior_apps:
-            #     for app in prior_apps['prior-registration-applications']:
-            #         print "   |"
-            #         for i,j in app.iteritems():
-            #             print "    - %-40s  %s"%(i,j)
+            header.update(extract_fields(node.find("case-file-header"),_case_file_header_fields))
+            print ".",
+            db.insert('trademarks', seqname = False, **header)
+            # Statements
+            statements = extract_case_file_statements(node.find("case-file-statements"))
+            print ".",
+            for i in statements:
+                i['tm'] = serial_number
+                db.insert('case_file_statements', seqname = False, **i)
+            # Events
+            events = extract_case_file_event_statements(node.find("case-file-event-statements"))
+            print ".",
+            for i in events:
+                i["tm"] = serial_number
+                db.insert('case_file_event_statements', seqname = False, **i)
+            # Prior applications
+            prior_apps = extract_prior_registration_applications(node.find("prior-registration-applications"))
+            if 'other_related_in' in prior_apps:
+                print ",",
+                db.update('trademarks', where = "name = $serial_number",
+                          serial_number = serial_number,
+                          other_related_in = prior_apps['other_related_in'])
+            if 'prior-registration-applications' in prior_apps:
+                print ".",
+                for i in prior_apps['prior-registration-applications']:
+                    i['tm'] = serial_number
+                    db.insert('prior_registration_applications', seqname = False, **i)
+            # Foreign applications
+            foreign_applications = extract_foreign_applications(node.find("foreign-applications"))
+            print ".",
+            for i in foreign_applications:
+                   i['tm'] = serial_number
+                   db.insert('foreign_applications', seqname = False, **i)
+                   
+            # Classifications
+            classifications = extract_classifications(node.find("classifications"))
+            print ".",
+            for i in classifications:
+                i['tm'] = serial_number
+                db.insert('classifications', seqname = False, **i)
 
-            # # Foreign applications
-            # foreign_applications = extract_foreign_applications(node.find("foreign-applications"))
-            # print " Foreign applications:"
-            # for k in foreign_applications:
-            #     print "   |"
-            #     for i,j in k.iteritems():
-            #         print "    - %-40s  %s"%(i,j)
-
-            # # Classifications
-            # classifications = extract_classifications(node.find("classifications"))
-            # print " Classifications:"
-            # for k in classifications:
-            #     print "   |"
-            #     for i,j in k.iteritems():
-            #         print "    - %-40s  %s"%(i,j)
-
-            # #Correspondent
-            # correspondent = extract_fields(node.find("correspondent"),_correspondent_fields)
-            # print " Correspondent:"
-            # for i,j in correspondent.iteritems():
-            #     print "   %-40s  %s"%(i,j)
+            #Correspondent
+            correspondent = extract_fields(node.find("correspondent"),_correspondent_fields)
+            print ".",
+            correspondent['tm'] = serial_number
+            db.insert('correspondent', seqname = False, **correspondent)
 
             # # Case file owners
             # case_file_owners = extract_case_file_owners(node.find("case-file-owners"))
@@ -365,13 +374,8 @@ def parse_and_insert(f):
             #     print "   |"
             #     for i,j in k.iteritems():
             #         print "    - %-40s  %s"%(i,j)
-
-            print 80*"="
-        for i in rows:
-            print len(i.keys())
-        db.multiple_insert('trademarks', values = rows, seqname = False)
         
 if __name__ == "__main__":
     logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
-    # parse_and_insert("sample_data/daily/sample.xml")
-    parse_and_insert("sample_data/daily/apc090101.xml")
+    parse_and_insert("sample_data/daily/sample.xml")
+    # parse_and_insert("sample_data/daily/apc090101.xml")

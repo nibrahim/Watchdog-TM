@@ -1,6 +1,11 @@
 -- Based on Trademark-Applications-Documentation-v2.0-07152005.pdf
-drop table case_file_statements;
-drop table trademarks CASCADE;
+DROP TABLE case_file_statements;
+DROP TABLE trademarks CASCADE;
+DROP TABLE case_file_event_statements ;
+DROP TABLE prior_registration_applications ;
+DROP TABLE foreign_applications;
+DROP TABLE classifications;
+DROP TABLE correspondent;
 
 CREATE TABLE trademarks (
        -- file_segment                   varchar(4),                 -- Will always contain 'TMRK'
@@ -79,14 +84,68 @@ CREATE TABLE trademarks (
        law_office_assigned_location_code varchar(3),
        current_location                  text,
        location_date                     date,
-       employee_name                     text
-       -- Case file header ends here
+       employee_name                     text,
+       -- Case file header ends here. Following are fields from other
+       -- nodes that are unique to a given case
+       other_related_in                  varchar(1)
 );
         
         
 CREATE TABLE case_file_statements (
        tm                                varchar(8) REFERENCES trademarks,
        type_code                         varchar(6),
-       text                              varchar(40)
+       text                              text
 );
 
+CREATE TABLE case_file_event_statements (
+       tm                                varchar(8) REFERENCES trademarks,
+       code                              varchar(4),
+       type                              varchar(1),                            
+       description_text                  text,                 
+       date                              date,
+       number                            varchar(3)
+);
+
+CREATE TABLE prior_registration_applications (
+       tm                                varchar(8) REFERENCES trademarks,
+       relationship_type                 varchar(1),
+       number                            varchar(8)
+);
+
+CREATE TABLE foreign_applications (
+       tm                                varchar(8) REFERENCES trademarks,
+       filing_date                       date,
+       registration_date                 date,
+       registration_expiration_date      date,
+       registration_renewal_date         date,
+       registration_renewal_expiration_date date,
+       entry_number                      varchar(3),
+       application_number                varchar(12),
+       country                           varchar(3),
+       other                             varchar(3),
+       registration_number               varchar(12),
+       renewal_number                    varchar(12),
+       foreign_priority_claim_in         varchar(1)
+);     
+
+CREATE TABLE classifications (
+       tm                                varchar(8) REFERENCES trademarks,
+       international_code_total_no       varchar(2), 
+       us_code_total_no                  varchar(2),                 
+       international_code                varchar(3),
+       us_code                           varchar(3),                          
+       status_code                       varchar(1),                      
+       status_date                       date,
+       first_use_anywhere_date           date,          
+       first_use_in_commerce_date        date,
+       primary_code                      varchar(3)
+);
+
+CREATE TABLE correspondent (
+       tm                               varchar(8) REFERENCES trademarks,
+       address_1                        text,
+       address_2                        text,
+       address_3                        text,  
+       address_4                        text,
+       address_5                        text
+);
