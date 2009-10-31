@@ -3,6 +3,7 @@ import code
 import logging
 
 import web 
+import psycopg2
 
 from xml.etree.ElementTree import ElementTree
 
@@ -120,7 +121,7 @@ def extract_fields(node, fields, debug = False):
             print " val before cleaning is ", val
         if i.endswith("-date"):
             if not val or (n.text and n.text.strip() == '0'):
-                val = "January 1, 10 BC"
+                val = "15000101"
         if debug:
             print " Storing '%s' as '%s'"%(val,i.replace("-","_"))
         info[i.replace("-","_")] = val
@@ -158,7 +159,7 @@ def extract_prior_registration_applications(node):
     if not node:
         return ret
     other_indicator = node.find("other-related-in")
-    if other_indicator:
+    if other_indicator is not None:
         other_related_in = other_indicator.text.strip()
         ret['other_related_in'] = other_related_in
     prior_reg_applications = []
@@ -271,13 +272,16 @@ def extract_madrid_international_filing_record(node):
                                                             "original-filing-date-uspto",
                                                             "international-registration-number",
                                                             "international-status-code",
-                                                            "international-status-date"]
+                                                            "international-status-date",
+                                                            "irregularity-reply-by-date",
+                                                            "international-renewal-date"
+                                                            ]
     _madrid_history_events_fields = ["code","date","description-text","entry-number"]
     for i in node.findall("madrid-international-filing-record"):
         d = extract_fields(i,_top_level_madrid_international_filing_record_fields)
-        d['madrid-history-events'] = []
+        d['madrid_history_events'] = []
         for j in i.findall("madrid-history-events/madrid-history-event"):
-            d['madrid-history-events'].append(extract_fields(j,_madrid_history_events_fields))
+            d['madrid_history_events'].append(extract_fields(j,_madrid_history_events_fields))
         ret.append(d)
     return ret
                                                             
@@ -317,9 +321,10 @@ def parse_and_insert(f):
             prior_apps = extract_prior_registration_applications(node.find("prior-registration-applications"))
             if 'other_related_in' in prior_apps:
                 print ",",
-                db.update('trademarks', where = "name = $serial_number",
-                          serial_number = serial_number,
-                          other_related_in = prior_apps['other_related_in'])
+                db.update('trademarks', where = "serial_number = $serial_number",
+                          vars = dict(serial_number = serial_number),
+                          other_related_in = prior_apps['other_related_in']
+                          )
             if 'prior-registration-applications' in prior_apps:
                 print ".",
                 for i in prior_apps['prior-registration-applications']:
@@ -346,36 +351,40 @@ def parse_and_insert(f):
             db.insert('correspondent', seqname = False, **correspondent)
 
             # # Case file owners
-            # case_file_owners = extract_case_file_owners(node.find("case-file-owners"))
-            # print " Case file owners:"
-            # for k in case_file_owners:
-            #     print "   |"
-            #     for i,j in k.iteritems():
-            #         print "    - %-40s  %s"%(i,j)
+            case_file_owners = extract_case_file_owners(node.find("case-file-owners"))
+            print ".",
+            for i in case_file_owners:
+                i['tm'] = serial_number
+                db.insert('case_file_owners', seqname = False, **i)
 
-            # # Design searches
-            # design_searches = extract_design_searches(node.find("design-searches"))
-            # print " Design searches:"
-            # for k in design_searches:
-            #     print "   |"
-            #     for i,j in k.iteritems():
-            #         print "    - %-40s  %s"%(i,j)
+            # Design searches
+            design_searches = extract_design_searches(node.find("design-searches"))
+            print ".",
+            for i in design_searches:
+                i['tm'] = serial_number
+                db.insert('design_searches', seqname = False, **i)
 
-            # # International registration
-            # international_registration = extract_fields(node.find("international-registration"),_international_registration_fields)
-            # print " International registration:"
-            # for i,j in international_registration.iteritems():
-            #     print "   %-40s  %s"%(i,j)
+            # International registration
+            international_registration = extract_fields(node.find("international-registration"),_international_registration_fields)
+            international_registration['tm'] = serial_number
+            db.insert("international_registrations", seqname = False, **international_registration)
 
-            # # Madrid international filing records
-            # madrid_international_filing_records = extract_madrid_international_filing_record(node.find("madrid-international-filing-requests"))
-            # print " Madrid international filing records:"
-            # for k in madrid_international_filing_records:
-            #     print "   |"
-            #     for i,j in k.iteritems():
-            #         print "    - %-40s  %s"%(i,j)
-        
+            # Madrid international filing records
+            madrid_international_filing_records = extract_madrid_international_filing_record(node.find("madrid-international-filing-requests"))
+            print ".",
+            for i in madrid_international_filing_records:
+                try:
+                    i['tm'] = serial_number
+                    history_events = i['madrid_history_events']
+                    del i['madrid_history_events'] # Keep this aside since we're not inserting it
+                    db.insert('madrid_international_filing_records', seqname = False, **i)
+                    for j in history_events:
+                        j['filing_record'] = i['reference_number'] # Foreign key for history events table
+                        db.insert('madrid_history_events', seqname = False, **j)
+                except psycopg2.IntegrityError:
+                    print "Skipping one madrid update ", i
+                
 if __name__ == "__main__":
     logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
-    parse_and_insert("sample_data/daily/sample.xml")
-    # parse_and_insert("sample_data/daily/apc090101.xml")
+    # parse_and_insert("sample_data/daily/sample.xml")
+    parse_and_insert("sample_data/daily/apc090101.xml")

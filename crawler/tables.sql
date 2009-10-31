@@ -6,6 +6,11 @@ DROP TABLE prior_registration_applications ;
 DROP TABLE foreign_applications;
 DROP TABLE classifications;
 DROP TABLE correspondent;
+DROP TABLE case_file_owners;
+DROP TABLE design_searches;
+DROP TABLE international_registrations;
+DROP TABLE madrid_international_filing_records CASCADE;
+DROP TABLE madrid_history_events;
 
 CREATE TABLE trademarks (
        -- file_segment                   varchar(4),                 -- Will always contain 'TMRK'
@@ -136,8 +141,11 @@ CREATE TABLE classifications (
        us_code                           varchar(3),                          
        status_code                       varchar(1),                      
        status_date                       date,
-       first_use_anywhere_date           date,          
-       first_use_in_commerce_date        date,
+       -- Although the following two are dates, they contain some
+       -- placeholder values which cannot be represented as
+       -- dates. Hence using varchar.
+       first_use_anywhere_date           varchar(8),          
+       first_use_in_commerce_date        varchar(8), 
        primary_code                      varchar(3)
 );
 
@@ -148,4 +156,68 @@ CREATE TABLE correspondent (
        address_3                        text,  
        address_4                        text,
        address_5                        text
+);
+
+CREATE TABLE case_file_owners (
+       tm                               varchar(8) REFERENCES trademarks,
+       entry_number                     varchar(2),
+       party_type                       varchar(2),
+       nationality_state                varchar(2),
+       nationality_country              varchar(3),
+       nationality_other                varchar(3),
+       legal_entity_type_code           varchar(2),
+       entity_statement                 text,
+       party_name                       text,
+       address_1                        text,
+       address_2                        text,
+       city                             text,
+       state                            varchar(2),
+       country                          varchar(2),
+       other                            varchar(3),
+       postcode                         varchar(15),
+       dba_aka_text                     text,
+       composed_of_statement            text,
+       name_change_explanation          varchar(75)
+);
+
+
+CREATE TABLE design_searches (
+       tm                               varchar(8) REFERENCES trademarks,
+       code                             varchar(6)
+);
+
+
+CREATE TABLE international_registrations (
+       tm                                varchar(8) REFERENCES trademarks,
+       international_registration_number varchar(10),
+       international_registration_date   date,
+       international_publication_date    date,
+       international_renewal_date        date,
+       auto_protection_date              date,
+       international_death_date          date,
+       international_status_code         varchar(3),
+       international_status_date         date,
+       priority_claimed_in               varchar(1),
+       priority_claimed_date             date,
+       first_refusal_in                  varchar(1)
+);
+
+CREATE TABLE madrid_international_filing_records (
+       tm                                varchar (8) REFERENCES trademarks,
+       reference_number                  varchar(20) PRIMARY KEY,
+       entry_number                      varchar(3),
+       original_filing_date_uspto        date,
+       international_registration_number varchar(10),
+       international_status_code         varchar(3),
+       international_status_date         date,
+       irregularity_reply_by_date        date,
+       international_renewal_date        date
+);
+
+CREATE TABLE madrid_history_events (
+       filing_record                     varchar(20) REFERENCES madrid_international_filing_records,
+       code                              varchar(6),
+       date                              date,
+       description_text                  text,
+       entry_number                      varchar(3)
 );
