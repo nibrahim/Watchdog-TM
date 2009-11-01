@@ -284,6 +284,25 @@ def extract_madrid_international_filing_record(node):
             d['madrid_history_events'].append(extract_fields(j,_madrid_history_events_fields))
         ret.append(d)
     return ret
+
+def insert_else_update(db, tablename, where_clause, vars, **params):
+    """Attempts an insert. Upon failure does an update instead"""
+    t0 = db.transaction()
+    try:
+        try:
+            t1 = db.transaction()
+            db.insert(tablename, seqname = False, **params)
+        except Exception,m:
+            # print m
+            # print "Updating %s, %s, %s, %s"%(tablename, where_clause, vars, params)
+            t1.rollback()
+            db.update(tablename, where = where_clause,
+                      vars = vars,**params)
+    except:
+        # print "Reraising"
+        raise
+    else:
+        t0.commit()
                                                             
     
 
@@ -304,22 +323,34 @@ def parse_and_insert(f):
             # Header information
             header.update(extract_fields(node.find("case-file-header"),_case_file_header_fields))
             print ".",
-            db.insert('trademarks', seqname = False, **header)
+            insert_else_update(db, 'trademarks',
+                               "serial_number = $serial_number",
+                               dict(serial_number = serial_number),
+                               **header)
             # Statements
             statements = extract_case_file_statements(node.find("case-file-statements"))
             print ".",
             for i in statements:
                 i['tm'] = serial_number
-                db.insert('case_file_statements', seqname = False, **i)
+                insert_else_update(db, 'case_file_statements',
+                                   "tm = $serial_number AND type_code = $type_code",
+                                   dict(serial_number = serial_number,
+                                        type_code     = i["type_code"]),
+                                   **i)
             # Events
             events = extract_case_file_event_statements(node.find("case-file-event-statements"))
             print ".",
             for i in events:
                 i["tm"] = serial_number
-                db.insert('case_file_event_statements', seqname = False, **i)
+                insert_else_update(db, 'case_file_event_statements',
+                                   "tm = $serial_number AND date = $date AND code = $code",
+                                   dict(serial_number = serial_number,
+                                        date = i["date"],
+                                        code = i["code"]),
+                                   **i)
             # Prior applications
             prior_apps = extract_prior_registration_applications(node.find("prior-registration-applications"))
-            if 'other_related_in' in prior_apps:
+            if 'other_related_in' in prior_apps: # Update this if we found it in this node
                 print ",",
                 db.update('trademarks', where = "serial_number = $serial_number",
                           vars = dict(serial_number = serial_number),
@@ -329,46 +360,61 @@ def parse_and_insert(f):
                 print ".",
                 for i in prior_apps['prior-registration-applications']:
                     i['tm'] = serial_number
-                    db.insert('prior_registration_applications', seqname = False, **i)
+                    insert_else_update(db, 'prior_registration_applications',
+                                       "tm = $serial_number",
+                                       dict(serial_number = serial_number),
+                                       **i)
             # Foreign applications
             foreign_applications = extract_foreign_applications(node.find("foreign-applications"))
             print ".",
             for i in foreign_applications:
                    i['tm'] = serial_number
-                   db.insert('foreign_applications', seqname = False, **i)
-                   
+                   insert_else_update(db, 'foreign_applications',
+                                      "tm = $serial_number",
+                                      dict(serial_number = serial_number),
+                                      **i)
             # Classifications
             classifications = extract_classifications(node.find("classifications"))
             print ".",
             for i in classifications:
                 i['tm'] = serial_number
-                db.insert('classifications', seqname = False, **i)
-
+                insert_else_update(db, 'classifications',
+                                   "tm = $serial_number",
+                                   dict(serial_number = serial_number),
+                                   **i)
             #Correspondent
             correspondent = extract_fields(node.find("correspondent"),_correspondent_fields)
             print ".",
             correspondent['tm'] = serial_number
-            db.insert('correspondent', seqname = False, **correspondent)
-
-            # # Case file owners
+            insert_else_update(db, 'correspondent',
+                               "tm = $serial_number",
+                               dict(serial_number = serial_number),
+                               **correspondent)
+            #Case file owners
             case_file_owners = extract_case_file_owners(node.find("case-file-owners"))
             print ".",
             for i in case_file_owners:
                 i['tm'] = serial_number
-                db.insert('case_file_owners', seqname = False, **i)
-
+                insert_else_update(db, 'case_file_owners',
+                                   "tm = $serial_number",
+                                   dict(serial_number = serial_number),
+                                   **i)
             # Design searches
             design_searches = extract_design_searches(node.find("design-searches"))
             print ".",
             for i in design_searches:
                 i['tm'] = serial_number
-                db.insert('design_searches', seqname = False, **i)
-
+                insert_else_update(db, 'design_searches',
+                                   "tm = $serial_number",
+                                   dict(serial_number = serial_number),
+                                   **i)
             # International registration
             international_registration = extract_fields(node.find("international-registration"),_international_registration_fields)
             international_registration['tm'] = serial_number
-            db.insert("international_registrations", seqname = False, **international_registration)
-
+            insert_else_update(db, 'international_registrations',
+                               "tm = $serial_number",
+                               dict(serial_number = serial_number),
+                               **international_registration)
             # Madrid international filing records
             madrid_international_filing_records = extract_madrid_international_filing_record(node.find("madrid-international-filing-requests"))
             print ".",
@@ -377,14 +423,25 @@ def parse_and_insert(f):
                     i['tm'] = serial_number
                     history_events = i['madrid_history_events']
                     del i['madrid_history_events'] # Keep this aside since we're not inserting it
-                    db.insert('madrid_international_filing_records', seqname = False, **i)
+                    insert_else_update(db, 'madrid_international_filing_records',
+                                       "tm = $serial_number",
+                                       dict(serial_number = serial_number),
+                                       **i)
                     for j in history_events:
                         j['filing_record'] = i['reference_number'] # Foreign key for history events table
-                        db.insert('madrid_history_events', seqname = False, **j)
-                except psycopg2.IntegrityError:
+                        insert_else_update(db, 'madrid_history_events',
+                                           "filing_record = $reference_number AND code = $code AND date = $date",
+                                           dict(reference_number = j['filing_record'],
+                                                code             = j["code"],
+                                                date             = j["date"]
+                                                ),
+                                           **j)
+                except psycopg2.IntegrityError,m:
                     print "Skipping one madrid update ", i
                 
 if __name__ == "__main__":
     logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
+    # parse_and_insert("sample_data/daily/sample1.xml")
     # parse_and_insert("sample_data/daily/sample.xml")
     parse_and_insert("sample_data/daily/apc090101.xml")
+    parse_and_insert("/tmp/apc090104.xml")

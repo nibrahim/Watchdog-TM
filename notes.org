@@ -118,4 +118,12 @@
 
 * [2009-10-31 Sat]
   CLOCK: [2009-10-31 Sat 23:47]--[2009-11-01 Sun 01:53] =>  2:06
+* [2009-11-01 Sun]
+  :CLOCK:
+  CLOCK: [2009-11-02 Mon 00:59]--[2009-11-02 Mon 02:05] =>  1:06
+  CLOCK: [2009-11-01 Sun 23:02]--[2009-11-01 Sun 23:54] =>  0:52
+  :END:
+  Reading. Figuring out differences between 24hr and daily
+   - daily is the actual dirt
+   - 24hr is just images.
   

@@ -99,26 +99,28 @@ CREATE TABLE trademarks (
 CREATE TABLE case_file_statements (
        tm                                varchar(8) REFERENCES trademarks,
        type_code                         varchar(6),
-       text                              text
+       text                              text,
+       PRIMARY KEY(tm, type_code)
 );
 
 CREATE TABLE case_file_event_statements (
        tm                                varchar(8) REFERENCES trademarks,
        code                              varchar(4),
        type                              varchar(1),                            
-       description_text                  text,                 
+       description_text                  text,
        date                              date,
-       number                            varchar(3)
+       number                            varchar(3),
+       PRIMARY KEY(tm, code, date)
 );
 
 CREATE TABLE prior_registration_applications (
-       tm                                varchar(8) REFERENCES trademarks,
+       tm                                varchar(8)  REFERENCES trademarks,
        relationship_type                 varchar(1),
        number                            varchar(8)
 );
 
 CREATE TABLE foreign_applications (
-       tm                                varchar(8) REFERENCES trademarks,
+       tm                                varchar(8)  REFERENCES trademarks,
        filing_date                       date,
        registration_date                 date,
        registration_expiration_date      date,
@@ -134,7 +136,7 @@ CREATE TABLE foreign_applications (
 );     
 
 CREATE TABLE classifications (
-       tm                                varchar(8) REFERENCES trademarks,
+       tm                                varchar(8)  REFERENCES trademarks,
        international_code_total_no       varchar(2), 
        us_code_total_no                  varchar(2),                 
        international_code                varchar(3),
@@ -150,7 +152,7 @@ CREATE TABLE classifications (
 );
 
 CREATE TABLE correspondent (
-       tm                               varchar(8) REFERENCES trademarks,
+       tm                               varchar(8)  REFERENCES trademarks,
        address_1                        text,
        address_2                        text,
        address_3                        text,  
@@ -159,7 +161,7 @@ CREATE TABLE correspondent (
 );
 
 CREATE TABLE case_file_owners (
-       tm                               varchar(8) REFERENCES trademarks,
+       tm                               varchar(8)  REFERENCES trademarks,
        entry_number                     varchar(2),
        party_type                       varchar(2),
        nationality_state                varchar(2),
@@ -182,13 +184,13 @@ CREATE TABLE case_file_owners (
 
 
 CREATE TABLE design_searches (
-       tm                               varchar(8) REFERENCES trademarks,
+       tm                               varchar(8)  REFERENCES trademarks,
        code                             varchar(6)
 );
 
 
 CREATE TABLE international_registrations (
-       tm                                varchar(8) REFERENCES trademarks,
+       tm                                varchar(8)  REFERENCES trademarks,
        international_registration_number varchar(10),
        international_registration_date   date,
        international_publication_date    date,
@@ -219,5 +221,6 @@ CREATE TABLE madrid_history_events (
        code                              varchar(6),
        date                              date,
        description_text                  text,
-       entry_number                      varchar(3)
+       entry_number                      varchar(3),
+       PRIMARY KEY (code, date, filing_record)
 );
