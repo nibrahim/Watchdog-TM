@@ -1,11 +1,18 @@
 #!/usr/bin/env python
-import code
+import sys
+import urllib
+import zipfile
 import logging
+import tempfile
+
 
 import web 
 import psycopg2
 
 from xml.etree.ElementTree import ElementTree
+
+
+BASE_URL = "https://eipweb.uspto.gov/TrademarkDailyXML/"
 
 # This is a list of the mandatory fields outside the 
 # "case-file-header" node.
@@ -307,19 +314,20 @@ def insert_else_update(db, tablename, where_clause, vars, **params):
     
 
 def parse_and_insert(f):
+    print "Parsing"
     db = web.database(dbn="postgres", user = "noufal", db="watchdog")
     tree = ElementTree()
     tree.parse(f)
     for action_key_node in tree.findall("application-information/file-segments/action-keys"):
         action_key = action_key_node.find("action-key").text.strip()
-        print "Action key is %s"%action_key
+        print "Action key : %s"%action_key
         rows = []
         for node in action_key_node.findall("case-file"):
             # Basic unique identification information
             header = extract_fields(node,_case_file_identification_fields)
             header['action_key'] = action_key
             serial_number = header["serial_number"]
-            print "\n ",serial_number,
+            print "\n Serial number:",serial_number,
             # Header information
             header.update(extract_fields(node.find("case-file-header"),_case_file_header_fields))
             print ".",
@@ -438,10 +446,26 @@ def parse_and_insert(f):
                                            **j)
                 except psycopg2.IntegrityError,m:
                     print "Skipping one madrid update ", i
+
+def get_file(location):
+    "Downloads and decompresses files"
+    try:
+        print "Fetching."
+        f = urllib.urlopen(BASE_URL+location).read()
+        print "Decompressing."
+        t = tempfile.NamedTemporaryFile()
+        t.write(f)
+        z = zipfile.ZipFile(t,"r")
+        fname = z.namelist()[0]
+        return z.open(fname)
+    except Exception,m:
+        print "Couldn't access file. Error was '%s'"%m
+        raise
                 
 if __name__ == "__main__":
     logging.basicConfig(level = logging.DEBUG, format="[%(lineno)d:%(funcName)s] - %(message)s")
     # parse_and_insert("sample_data/daily/sample1.xml")
     # parse_and_insert("sample_data/daily/sample.xml")
-    parse_and_insert("sample_data/daily/apc090101.xml")
-    parse_and_insert("/tmp/apc090104.xml")
+    parse_and_insert(get_file(sys.argv[1]))
+    # parse_and_insert("sample_data/daily/apc090101.xml")
+    # parse_and_insert("/tmp/apc090104.xml")
