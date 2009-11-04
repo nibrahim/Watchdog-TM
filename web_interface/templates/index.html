@@ -1,0 +1,15 @@
+$def with (res)
+<html>
+<head>
+<title> Information for trademark </title>
+</head>
+<table>
+<tr>
+  <th>Registration number</th>
+</tr>
+  $for row in res:
+  <tr>
+    <td>$row['registration_number']</td>
+  </tr>      
+</table>
+</html>
