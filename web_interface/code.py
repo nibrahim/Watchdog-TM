@@ -21,10 +21,11 @@ class index:
         if sno:
             d = dict(serial_number = sno)
             s = db.where('trademarks', **d)
+            
         if rno:
             d = dict(registration_number = rno)
             s = db.where('trademarks', **d)
-        return render.index(s)
+        return render.index(s[0])
 
 if __name__ == "__main__":
     app.run()

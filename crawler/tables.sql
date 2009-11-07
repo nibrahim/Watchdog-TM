@@ -16,17 +16,17 @@ CREATE TABLE trademarks (
        -- file_segment                   varchar(4),                 -- Will always contain 'TMRK'
        action_key                        varchar(2),	             -- Action key for type of event
        -- Case file starts here
-       serial_number                     varchar(8) PRIMARY KEY,     -- Case serial number (unique)
-       registration_number               varchar(7),                 -- Registration no.
+       serial_number                     varchar(8) PRIMARY KEY,     -- Case serial number (unique) -- DISPLAY
+       registration_number               varchar(7),                 -- Registration no. -- DISPLAY
        transaction_date                  date,
        -- Case file header starts here
-       filing_date                       date,
-       registration_date                 date,
+       filing_date                       date,                       -- DISPLAY
+       registration_date                 date,                       -- DISPLAY
        status_code                       varchar(3),
        status_date                       date,
-       mark_identification               text,
+       mark_identification               text,                       -- DISPLAY
        mark_drawing_code                 varchar(4),
-       published_for_opposition_date     date,
+       published_for_opposition_date     date,                       -- DISPLAY
        amend_to_register_date            date, 
        abandonment_date                  date,
        cancellation_code                 varchar(1),
@@ -34,7 +34,7 @@ CREATE TABLE trademarks (
        republished_12c_date              date,
        domestic_rep_name                 text,
        attorney_docket_number            varchar(12),
-       attorney_name                     text,
+       attorney_name                     text,                       -- Attorney of record
        -- Boolean fields indicating various statuses. All are either T
        -- or F. The _in stands for 'indicator'.
        principal_register_amended_in     varchar(1),     
@@ -146,8 +146,8 @@ CREATE TABLE classifications (
        -- Although the following two are dates, they contain some
        -- placeholder values which cannot be represented as
        -- dates. Hence using varchar.
-       first_use_anywhere_date           varchar(8),          
-       first_use_in_commerce_date        varchar(8), 
+       first_use_anywhere_date           varchar(8),          -- DISPLAY
+       first_use_in_commerce_date        varchar(8),          -- DISPLAY
        primary_code                      varchar(3)
 );
 
@@ -191,7 +191,7 @@ CREATE TABLE design_searches (
 
 CREATE TABLE international_registrations (
        tm                                varchar(8)  REFERENCES trademarks,
-       international_registration_number varchar(10),
+       international_registration_number varchar(10),        -- DISPLAY
        international_registration_date   date,
        international_publication_date    date,
        international_renewal_date        date,
@@ -224,3 +224,14 @@ CREATE TABLE madrid_history_events (
        entry_number                      varchar(3),
        PRIMARY KEY (code, date, filing_record)
 );
+
+-- MISSING ITEMS
+--  * ASSIGNMENT RECORDED
+--  * Register
+
+
+-- OTHERS TO BE INCLUDED
+--  * Summarise case-file-statements
+--  * Current filing basis/original filing basis    
+--  * Summarise case-file-owner
+--  * Summarise indicators to denote type of mark

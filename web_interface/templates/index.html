@@ -1,15 +1,28 @@
-$def with (res)
+$def with (tm, classifications)
 <html>
 <head>
+<style type="text/css">
+  table th { text-align: right; padding: 1pt 25pt 1pt 1pt;
+  }
+</style>  
 <title> Information for trademark </title>
 </head>
+<body>
 <table>
 <tr>
-  <th>Registration number</th>
+  <th>Word mark</th><td>$res['mark_identification']</td>
+</tr><tr> 
+  <th>Registration number</th><td>$res['registration_number']</td>
+</tr><tr> 
+  <th>Serial number</th><td>$res['serial_number']</td>
+</tr><tr> 
+  <th>Filing date</th><td>$res['filing_date']</td>
+</tr><tr> 
+  <th>Published for opposition</th><td>$res['published_for_opposition_date']</td>
+</tr><tr> 
+    
+
 </tr>
-  $for row in res:
-  <tr>
-    <td>$row['registration_number']</td>
-  </tr>      
 </table>
+</body>
 </html>
