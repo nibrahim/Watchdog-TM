@@ -1,4 +1,4 @@
-$def with (tm, classifications)
+$def with (tm)
 <html>
 <head>
 <style type="text/css">
@@ -8,21 +8,22 @@ $def with (tm, classifications)
 <title> Information for trademark </title>
 </head>
 <body>
-<table>
-<tr>
-  <th>Word mark</th><td>$res['mark_identification']</td>
-</tr><tr> 
-  <th>Registration number</th><td>$res['registration_number']</td>
-</tr><tr> 
-  <th>Serial number</th><td>$res['serial_number']</td>
-</tr><tr> 
-  <th>Filing date</th><td>$res['filing_date']</td>
-</tr><tr> 
-  <th>Published for opposition</th><td>$res['published_for_opposition_date']</td>
-</tr><tr> 
-    
-
-</tr>
-</table>
+$if tm:
+  <table>
+  <tr>
+    <th>Word mark</th><td>$tm['mark_identification']</td>
+  </tr><tr> 
+    <th>Registration number</th><td>$tm['registration_number']</td>
+  </tr><tr> 
+    <th>Serial number</th><td>$tm['serial_number']</td>
+  </tr><tr> 
+    <th>Filing date</th><td>$tm['filing_date']</td>
+  </tr><tr> 
+    <th>Published for opposition</th><td>$tm['published_for_opposition_date']</td>
+  </tr><tr> 
+  </tr>
+  </table>
+$else:
+  <em>No records match your search.</em>
 </body>
 </html>
