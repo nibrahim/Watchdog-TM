@@ -1,16 +1,24 @@
-$def with (tm)
+$def with (tm, case_file_statements, case_file_event_statements)
 <html>
 <head>
 <style type="text/css">
+table { 
+        border: 1px solid black;
+        }
 table th { text-align: right; 
            padding: 1pt 25pt 1pt 1pt;
            }
+table caption { 
+                background-color: #ddd;
+                border: 1px solid black;
+}
 </style>  
-<title> Information for trademark </title>
-</head>
-<body>
 $if tm:
+  <title> Information for trademark for $tm['mark_identification']</title>
+  </head>
+  <body>
   <table>
+  <caption> Basic information </caption>
   <tr>
     <th>Action key in official gazette</th><td>$tm['action_key']</td>
   </tr><tr>
@@ -26,7 +34,26 @@ $if tm:
   </tr><tr> 
   </tr>
   </table>
+  <hr/>
+  <table>
+  <caption>Case file statements</caption>
+  $for idx,cs in enumerate(case_file_statements):
+    <tr>
+      <th>${idx+1}</th><td>$cs</td>
+    </tr>
+  </table>
+  <hr/>
+  <table>
+  <caption>Case file event statements</caption>
+  $for idx,cs in enumerate(case_file_event_statements):
+    <tr>
+      <th>${idx+1}</th><td>$cs</td>
+    </tr>
+  </table>
 $else:
+  <title>No records match your search</title>
+  </head>
+  <body>
   <em>No records match your search.</em>
 </body>
 </html>
